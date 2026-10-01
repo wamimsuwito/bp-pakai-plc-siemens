@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </radialGradient>
+    <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0.9"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Outer Slate Background -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)"/>
+  
+  <!-- Glowing Tech Circular Ring -->
+  <circle cx="256" cy="256" r="180" fill="none" stroke="url(#glowGrad)" stroke-width="12" />
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#1e293b" stroke-width="4" stroke-dasharray="10, 15" stroke-opacity="0.6"/>
+  
+  <!-- Concrete Batch Mixer Geometric Icon in Center -->
+  <g transform="translate(156, 156)" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Outer batch kettle body -->
+    <path d="M 50,40 L 150,40 L 170,110 L 140,160 L 60,160 L 30,110 Z" fill="#111827" stroke="#06b6d4" stroke-width="16" />
+    <!-- Mixing blade indicator / center rotor -->
+    <circle cx="100" cy="100" r="28" fill="none" stroke="#10b981" stroke-width="12" />
+    <line x1="100" y1="52" x2="100" y2="72" stroke="#10b981" stroke-width="12" />
+    <line x1="100" y1="128" x2="100" y2="148" stroke="#10b981" stroke-width="12" />
+    <!-- Concrete flow dropping down -->
+    <path d="M 85,175 Q 100,210 115,175" fill="none" stroke="#f59e0b" stroke-width="12" stroke-linecap="round" />
+  </g>
+</svg>

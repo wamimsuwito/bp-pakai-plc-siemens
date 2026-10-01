@@ -1,0 +1,6 @@
+{
+  "name": "Sistem Kontrol Batching Plant Otomatis",
+  "description": "Aplikasi kontrol otomatis untuk batching plant beton dengan indikator timbangan aggregat, semen, dan air.",
+  "requestFramePermissions": ["serial"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

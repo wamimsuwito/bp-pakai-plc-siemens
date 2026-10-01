@@ -1,0 +1,11 @@
+/app/applet/dotnet_backend/src/BatchingPlant.Domain/bin/Debug/net10.0/BatchingPlant.Domain.deps.json
+/app/applet/dotnet_backend/src/BatchingPlant.Domain/bin/Debug/net10.0/BatchingPlant.Domain.dll
+/app/applet/dotnet_backend/src/BatchingPlant.Domain/bin/Debug/net10.0/BatchingPlant.Domain.pdb
+/app/applet/dotnet_backend/src/BatchingPlant.Domain/obj/Debug/net10.0/BatchingPlant.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/app/applet/dotnet_backend/src/BatchingPlant.Domain/obj/Debug/net10.0/BatchingPlant.Domain.AssemblyInfoInputs.cache
+/app/applet/dotnet_backend/src/BatchingPlant.Domain/obj/Debug/net10.0/BatchingPlant.Domain.AssemblyInfo.cs
+/app/applet/dotnet_backend/src/BatchingPlant.Domain/obj/Debug/net10.0/BatchingPlant.Domain.csproj.CoreCompileInputs.cache
+/app/applet/dotnet_backend/src/BatchingPlant.Domain/obj/Debug/net10.0/BatchingPlant.Domain.dll
+/app/applet/dotnet_backend/src/BatchingPlant.Domain/obj/Debug/net10.0/refint/BatchingPlant.Domain.dll
+/app/applet/dotnet_backend/src/BatchingPlant.Domain/obj/Debug/net10.0/BatchingPlant.Domain.pdb
+/app/applet/dotnet_backend/src/BatchingPlant.Domain/obj/Debug/net10.0/ref/BatchingPlant.Domain.dll

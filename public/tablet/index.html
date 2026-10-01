@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lisa Batch Remote</title>
+    <script>
+      // Automatically redirect to the main app root with hash routing for the tablet view
+      var currentPath = window.location.pathname;
+      var newPath = currentPath.replace(/\/tablet\/?$/, '') + '/index.html#tablet';
+      if (newPath.startsWith('//')) {
+         newPath = newPath.substring(1);
+      }
+      window.location.replace(newPath + window.location.search);
+    </script>
+  </head>
+  <body style="background: #0f172a; color: #38bdf8; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; user-select: none;">
+    <div style="text-align: center;">
+      <div style="width: 40px; height: 40px; border: 4px solid #1e293b; border-top: 4px solid #06b6d4; border-radius: 50%; margin: 0 auto 16px; animation: spin 1s linear infinite;"></div>
+      <h2 style="font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 8px; font-size: 14px; color: #e2e8f0;">PT. Farika Riau Perkasa</h2>
+      <p style="font-size: 9px; color: #64748b; margin: 0; font-family: monospace; letter-spacing: 0.05em;">LOADING LISA BATCH REMOTE...</p>
+    </div>
+    <style>
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
+  </body>
+</html>

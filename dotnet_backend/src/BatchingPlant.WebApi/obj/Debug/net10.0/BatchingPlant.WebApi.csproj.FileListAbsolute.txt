@@ -1,0 +1,8 @@
+/app/applet/dotnet_backend/src/BatchingPlant.WebApi/obj/Debug/net10.0/BatchingPlant.WebApi.csproj.AssemblyReference.cache
+/app/applet/dotnet_backend/src/BatchingPlant.WebApi/obj/Debug/net10.0/rpswa.dswa.cache.json
+/app/applet/dotnet_backend/src/BatchingPlant.WebApi/obj/Debug/net10.0/BatchingPlant.WebApi.GeneratedMSBuildEditorConfig.editorconfig
+/app/applet/dotnet_backend/src/BatchingPlant.WebApi/obj/Debug/net10.0/BatchingPlant.WebApi.AssemblyInfoInputs.cache
+/app/applet/dotnet_backend/src/BatchingPlant.WebApi/obj/Debug/net10.0/BatchingPlant.WebApi.AssemblyInfo.cs
+/app/applet/dotnet_backend/src/BatchingPlant.WebApi/obj/Debug/net10.0/BatchingPlant.WebApi.csproj.CoreCompileInputs.cache
+/app/applet/dotnet_backend/src/BatchingPlant.WebApi/obj/Debug/net10.0/BatchingPlant.WebApi.MvcApplicationPartsAssemblyInfo.cs
+/app/applet/dotnet_backend/src/BatchingPlant.WebApi/obj/Debug/net10.0/BatchingPlant.WebApi.MvcApplicationPartsAssemblyInfo.cache

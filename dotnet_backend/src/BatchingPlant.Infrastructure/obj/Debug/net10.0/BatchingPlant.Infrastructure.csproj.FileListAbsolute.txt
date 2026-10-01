@@ -1,0 +1,17 @@
+/app/applet/dotnet_backend/src/BatchingPlant.Infrastructure/obj/Debug/net10.0/BatchingPlant.Infrastructure.csproj.AssemblyReference.cache
+/app/applet/dotnet_backend/src/BatchingPlant.Infrastructure/obj/Debug/net10.0/BatchingPlant.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+/app/applet/dotnet_backend/src/BatchingPlant.Infrastructure/obj/Debug/net10.0/BatchingPlant.Infrastructure.AssemblyInfoInputs.cache
+/app/applet/dotnet_backend/src/BatchingPlant.Infrastructure/obj/Debug/net10.0/BatchingPlant.Infrastructure.AssemblyInfo.cs
+/app/applet/dotnet_backend/src/BatchingPlant.Infrastructure/obj/Debug/net10.0/BatchingPlant.Infrastructure.csproj.CoreCompileInputs.cache
+/app/applet/dotnet_backend/src/BatchingPlant.Infrastructure/bin/Debug/net10.0/BatchingPlant.Infrastructure.deps.json
+/app/applet/dotnet_backend/src/BatchingPlant.Infrastructure/bin/Debug/net10.0/BatchingPlant.Infrastructure.dll
+/app/applet/dotnet_backend/src/BatchingPlant.Infrastructure/bin/Debug/net10.0/BatchingPlant.Infrastructure.pdb
+/app/applet/dotnet_backend/src/BatchingPlant.Infrastructure/bin/Debug/net10.0/BatchingPlant.Application.dll
+/app/applet/dotnet_backend/src/BatchingPlant.Infrastructure/bin/Debug/net10.0/BatchingPlant.Domain.dll
+/app/applet/dotnet_backend/src/BatchingPlant.Infrastructure/bin/Debug/net10.0/BatchingPlant.Domain.pdb
+/app/applet/dotnet_backend/src/BatchingPlant.Infrastructure/bin/Debug/net10.0/BatchingPlant.Application.pdb
+/app/applet/dotnet_backend/src/BatchingPlant.Infrastructure/obj/Debug/net10.0/Batching.843B1571.Up2Date
+/app/applet/dotnet_backend/src/BatchingPlant.Infrastructure/obj/Debug/net10.0/BatchingPlant.Infrastructure.dll
+/app/applet/dotnet_backend/src/BatchingPlant.Infrastructure/obj/Debug/net10.0/refint/BatchingPlant.Infrastructure.dll
+/app/applet/dotnet_backend/src/BatchingPlant.Infrastructure/obj/Debug/net10.0/BatchingPlant.Infrastructure.pdb
+/app/applet/dotnet_backend/src/BatchingPlant.Infrastructure/obj/Debug/net10.0/ref/BatchingPlant.Infrastructure.dll
