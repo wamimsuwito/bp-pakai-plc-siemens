@@ -79,13 +79,15 @@ public class PlcController : ControllerBase
     }
 
     [HttpGet("status")]
-    public async Task<IActionResult> GetStatus()
+    public async Task<IActionResult> GetStatus(CancellationToken ct)
     {
-        var telemetry = await _plcService.ReadTelemetryAsync();
-        var ioStatus = await _plcService.ReadIoStatusAsync();
+        var telemetry = await _plcService.ReadTelemetryAsync(ct);
+        var ioStatus = await _plcService.ReadIoStatusAsync(ct);
         return Ok(new
         {
             connected = _plcService.IsConnected,
+            status = _plcService.IsConnected ? "CONNECTED" : "PLC_DISCONNECTED",
+            mode = _plcService.Mode.ToString(),
             telemetry,
             ioStatus
         });

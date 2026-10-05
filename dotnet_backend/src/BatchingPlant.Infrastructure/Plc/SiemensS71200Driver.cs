@@ -31,9 +31,11 @@ public class SiemensS71200Driver : IPlcClient, ISiemensS7Service
             _logger.Information("[PRODUCTION] Connecting to Siemens S7-1200 PLC at {Ip}, Rack: {Rack}, Slot: {Slot}", _ip, _rack, _slot);
 
             _plc = new S7.Net.Plc(CpuType.S71200, _ip, (short)_rack, (short)_slot);
+            using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            timeoutCts.CancelAfter(TimeSpan.FromSeconds(2));
             try
             {
-                await _plc.OpenAsync(ct);
+                await _plc.OpenAsync(timeoutCts.Token);
                 Status = PlcConnectionStatus.CONNECTED;
                 _logger.Information("SUCCESS: Connected to physical Siemens S7-1200 PLC.");
                 return true;

@@ -35,3 +35,19 @@ public enum AlarmSeverity
     CRITICAL = 2,
     EMERGENCY = 3
 }
+
+public enum MaterialType
+{
+    AGGREGATE = 0,
+    CEMENT = 1,
+    WATER = 2,
+    ADMIXTURE = 3
+}
+
+public enum JmfStatus
+{
+    DRAFT = 0,
+    ACTIVE = 1,
+    INACTIVE = 2,
+    ARCHIVED = 3
+}

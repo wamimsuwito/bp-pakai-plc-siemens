@@ -12,7 +12,11 @@ using BatchingPlant.WebApi.Services;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(new WebApplicationOptions
+{
+    Args = args,
+    ContentRootPath = AppContext.BaseDirectory
+});
 
 // 1. Storage Paths Initialization & Directory Creation
 var storagePath = new StoragePathService(builder.Configuration);
@@ -71,6 +75,7 @@ builder.Services.AddScoped<ICalibrationRepository, CalibrationRepository>();
 builder.Services.AddScoped<IBackupService, BackupService>();
 builder.Services.AddScoped<LegacyStorageMigrationService>();
 builder.Services.AddScoped<ISyncEngine, SyncEngine>();
+builder.Services.AddScoped<IJmfService, JmfService>();
 builder.Services.AddSingleton<IBatchExecutionService, BatchExecutionService>();
 
 // 6. Background Services (Replication & PLC High-Speed Telemetry Broadcaster)
@@ -104,6 +109,151 @@ using (var scope = app.Services.CreateScope())
 
     localDb.Database.EnsureCreated();
 
+    // Incremental SQLite schema setup for Phase 2.1 tables if database was created by previous phase
+    localDb.Database.ExecuteSqlRaw(@"
+        CREATE TABLE IF NOT EXISTS ""Materials"" (
+            ""Id"" TEXT NOT NULL CONSTRAINT ""PK_Materials"" PRIMARY KEY,
+            ""Code"" TEXT NOT NULL,
+            ""Name"" TEXT NOT NULL,
+            ""MaterialType"" INTEGER NOT NULL,
+            ""Unit"" TEXT NOT NULL,
+            ""IsActive"" INTEGER NOT NULL,
+            ""CreatedAt"" TEXT NOT NULL,
+            ""UpdatedAt"" TEXT NULL
+        );
+        CREATE UNIQUE INDEX IF NOT EXISTS ""IX_Materials_Code"" ON ""Materials"" (""Code"");
+
+        CREATE TABLE IF NOT EXISTS ""Jmfs"" (
+            ""Id"" TEXT NOT NULL CONSTRAINT ""PK_Jmfs"" PRIMARY KEY,
+            ""Code"" TEXT NOT NULL,
+            ""Name"" TEXT NOT NULL,
+            ""Description"" TEXT NOT NULL,
+            ""TargetVolumeM3"" REAL NOT NULL,
+            ""IsActive"" INTEGER NOT NULL,
+            ""CurrentVersionId"" TEXT NULL,
+            ""CreatedAt"" TEXT NOT NULL,
+            ""UpdatedAt"" TEXT NULL
+        );
+        CREATE UNIQUE INDEX IF NOT EXISTS ""IX_Jmfs_Code"" ON ""Jmfs"" (""Code"");
+
+        CREATE TABLE IF NOT EXISTS ""JmfVersions"" (
+            ""Id"" TEXT NOT NULL CONSTRAINT ""PK_JmfVersions"" PRIMARY KEY,
+            ""JmfId"" TEXT NOT NULL,
+            ""VersionNumber"" INTEGER NOT NULL,
+            ""Status"" INTEGER NOT NULL,
+            ""TargetSlumpCm"" REAL NOT NULL,
+            ""MixingTimeSec"" INTEGER NOT NULL,
+            ""Notes"" TEXT NOT NULL,
+            ""IsUsedInProduction"" INTEGER NOT NULL,
+            ""ActivatedAt"" TEXT NULL,
+            ""CreatedAt"" TEXT NOT NULL,
+            ""UpdatedAt"" TEXT NULL,
+            CONSTRAINT ""FK_JmfVersions_Jmfs_JmfId"" FOREIGN KEY (""JmfId"") REFERENCES ""Jmfs"" (""Id"") ON DELETE CASCADE
+        );
+        CREATE UNIQUE INDEX IF NOT EXISTS ""IX_JmfVersions_JmfId_VersionNumber"" ON ""JmfVersions"" (""JmfId"", ""VersionNumber"");
+
+        CREATE TABLE IF NOT EXISTS ""RecipeComponents"" (
+            ""Id"" TEXT NOT NULL CONSTRAINT ""PK_RecipeComponents"" PRIMARY KEY,
+            ""JmfVersionId"" TEXT NOT NULL,
+            ""MaterialId"" TEXT NOT NULL,
+            ""TargetQuantity"" TEXT NOT NULL,
+            ""Unit"" TEXT NOT NULL,
+            ""SequenceOrder"" INTEGER NOT NULL,
+            ""TolerancePercentage"" REAL NOT NULL,
+            ""CreatedAt"" TEXT NOT NULL,
+            ""UpdatedAt"" TEXT NULL,
+            CONSTRAINT ""FK_RecipeComponents_JmfVersions_JmfVersionId"" FOREIGN KEY (""JmfVersionId"") REFERENCES ""JmfVersions"" (""Id"") ON DELETE CASCADE,
+            CONSTRAINT ""FK_RecipeComponents_Materials_MaterialId"" FOREIGN KEY (""MaterialId"") REFERENCES ""Materials"" (""Id"") ON DELETE RESTRICT
+        );
+        CREATE UNIQUE INDEX IF NOT EXISTS ""IX_RecipeComponents_JmfVersionId_MaterialId"" ON ""RecipeComponents"" (""JmfVersionId"", ""MaterialId"");
+
+        CREATE TABLE IF NOT EXISTS ""BatchJmfSnapshots"" (
+            ""Id"" TEXT NOT NULL CONSTRAINT ""PK_BatchJmfSnapshots"" PRIMARY KEY,
+            ""BatchLogId"" TEXT NOT NULL,
+            ""JmfId"" TEXT NOT NULL,
+            ""JmfCode"" TEXT NOT NULL,
+            ""JmfName"" TEXT NOT NULL,
+            ""JmfVersionId"" TEXT NOT NULL,
+            ""VersionNumber"" INTEGER NOT NULL,
+            ""TargetVolumeM3"" REAL NOT NULL,
+            ""ComponentsJson"" TEXT NOT NULL,
+            ""CreatedAt"" TEXT NOT NULL,
+            ""UpdatedAt"" TEXT NULL
+        );
+        CREATE INDEX IF NOT EXISTS ""IX_BatchJmfSnapshots_BatchLogId"" ON ""BatchJmfSnapshots"" (""BatchLogId"");
+    ");
+
+    try {
+        localDb.Database.ExecuteSqlRaw(@"ALTER TABLE ""BatchLogs"" ADD COLUMN ""JmfSnapshotId"" TEXT NULL;");
+    } catch { /* Column already exists */ }
+
+    // Seed default Materials if empty
+    if (!localDb.Materials.Any())
+    {
+        var matPasir1 = new Material { Id = "MAT-PASIR-1", Code = "PASIR-1", Name = "Pasir Kasar Cor", MaterialType = MaterialType.AGGREGATE, Unit = "kg", IsActive = true };
+        var matPasir2 = new Material { Id = "MAT-PASIR-2", Code = "PASIR-2", Name = "Pasir Halus", MaterialType = MaterialType.AGGREGATE, Unit = "kg", IsActive = true };
+        var matBatu1 = new Material { Id = "MAT-BATU-1", Code = "BATU-1", Name = "Split 1-2 (Batu Pecah)", MaterialType = MaterialType.AGGREGATE, Unit = "kg", IsActive = true };
+        var matBatu2 = new Material { Id = "MAT-BATU-2", Code = "BATU-2", Name = "Screening 0.5-1", MaterialType = MaterialType.AGGREGATE, Unit = "kg", IsActive = true };
+        var matSemen = new Material { Id = "MAT-SEMEN", Code = "SEMEN", Name = "Semen Portland Tipe 1", MaterialType = MaterialType.CEMENT, Unit = "kg", IsActive = true };
+        var matAir = new Material { Id = "MAT-AIR", Code = "AIR", Name = "Air Bersih Batching", MaterialType = MaterialType.WATER, Unit = "kg", IsActive = true };
+        var matAdmix = new Material { Id = "MAT-ADMIX", Code = "ADMIX", Name = "Sika ViscoCrete", MaterialType = MaterialType.ADMIXTURE, Unit = "liter", IsActive = true };
+
+        localDb.Materials.AddRange(matPasir1, matPasir2, matBatu1, matBatu2, matSemen, matAir, matAdmix);
+        localDb.SaveChanges();
+    }
+
+    // Seed default JMFs with Version 1 and components if empty
+    if (!localDb.Jmfs.Any())
+    {
+        void AddDefaultJmf(string code, string name, decimal p1, decimal p2, decimal b1, decimal b2, decimal sem, decimal air, decimal adm)
+        {
+            var jmfId = Guid.NewGuid().ToString();
+            var verId = Guid.NewGuid().ToString();
+
+            var version = new JmfVersion
+            {
+                Id = verId,
+                JmfId = jmfId,
+                VersionNumber = 1,
+                Status = JmfStatus.ACTIVE,
+                TargetSlumpCm = 12.0,
+                MixingTimeSec = 15,
+                Notes = "Standard mix release",
+                IsUsedInProduction = false,
+                ActivatedAt = DateTime.UtcNow,
+                RecipeComponents = new List<RecipeComponent>
+                {
+                    new() { JmfVersionId = verId, MaterialId = "MAT-PASIR-1", TargetQuantity = p1, Unit = "kg", SequenceOrder = 1, TolerancePercentage = 2.0 },
+                    new() { JmfVersionId = verId, MaterialId = "MAT-PASIR-2", TargetQuantity = p2, Unit = "kg", SequenceOrder = 2, TolerancePercentage = 2.0 },
+                    new() { JmfVersionId = verId, MaterialId = "MAT-BATU-1", TargetQuantity = b1, Unit = "kg", SequenceOrder = 3, TolerancePercentage = 2.0 },
+                    new() { JmfVersionId = verId, MaterialId = "MAT-BATU-2", TargetQuantity = b2, Unit = "kg", SequenceOrder = 4, TolerancePercentage = 2.0 },
+                    new() { JmfVersionId = verId, MaterialId = "MAT-SEMEN", TargetQuantity = sem, Unit = "kg", SequenceOrder = 5, TolerancePercentage = 1.0 },
+                    new() { JmfVersionId = verId, MaterialId = "MAT-AIR", TargetQuantity = air, Unit = "kg", SequenceOrder = 6, TolerancePercentage = 1.5 },
+                    new() { JmfVersionId = verId, MaterialId = "MAT-ADMIX", TargetQuantity = adm, Unit = "liter", SequenceOrder = 7, TolerancePercentage = 3.0 }
+                }
+            };
+
+            var jmf = new Jmf
+            {
+                Id = jmfId,
+                Code = code,
+                Name = name,
+                Description = $"Standar Mutu Beton {code}",
+                TargetVolumeM3 = 1.0,
+                IsActive = true,
+                CurrentVersionId = verId,
+                Versions = new List<JmfVersion> { version }
+            };
+
+            localDb.Jmfs.Add(jmf);
+        }
+
+        AddDefaultJmf("K225", "Mutu Beton K-225 Slump 12", 520, 150, 650, 330, 300, 150, 1.5m);
+        AddDefaultJmf("K250", "Mutu Beton K-250 Slump 12", 550, 170, 680, 300, 350, 160, 2.0m);
+        AddDefaultJmf("K300", "Mutu Beton K-300 Slump 12", 650, 120, 780, 350, 400, 180, 2.5m);
+        localDb.SaveChanges();
+    }
+
     // Seed default JMF recipes if empty
     if (!localDb.JobMixFormulas.Any())
     {
@@ -126,7 +276,7 @@ using (var scope = app.Services.CreateScope())
     else
     {
         // Automatically upgrade any legacy unhashed accounts
-        var unhashed = localDb.UserAccounts.Where(u => !u.PasswordHash.Contains('.')).ToList();
+        var unhashed = localDb.UserAccounts.AsEnumerable().Where(u => !u.PasswordHash.Contains('.')).ToList();
         foreach (var u in unhashed)
         {
             u.PasswordHash = hasher.HashPassword(u.PasswordHash);

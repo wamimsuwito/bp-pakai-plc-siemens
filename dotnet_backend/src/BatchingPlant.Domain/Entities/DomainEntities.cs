@@ -84,7 +84,80 @@ public class BatchLog : BaseEntity
     // Cloud Synchronization flag
     public bool IsSyncedToCentral { get; set; } = false;
     public DateTime? SyncedAt { get; set; }
+
+    // Immutable JMF Snapshot link
+    public string? JmfSnapshotId { get; set; }
+    public BatchJmfSnapshot? JmfSnapshot { get; set; }
 }
+
+public class Material : BaseEntity
+{
+    public string Code { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public MaterialType MaterialType { get; set; } = MaterialType.AGGREGATE;
+    public string Unit { get; set; } = "kg";
+    public bool IsActive { get; set; } = true;
+}
+
+public class Jmf : BaseEntity
+{
+    public string Code { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public double TargetVolumeM3 { get; set; } = 1.0;
+    public bool IsActive { get; set; } = true;
+    public string? CurrentVersionId { get; set; }
+    public List<JmfVersion> Versions { get; set; } = new();
+}
+
+public class JmfVersion : BaseEntity
+{
+    public string JmfId { get; set; } = string.Empty;
+    public Jmf? Jmf { get; set; }
+    public int VersionNumber { get; set; } = 1;
+    public JmfStatus Status { get; set; } = JmfStatus.DRAFT;
+    public double TargetSlumpCm { get; set; } = 12.0;
+    public int MixingTimeSec { get; set; } = 15;
+    public string Notes { get; set; } = string.Empty;
+    public bool IsUsedInProduction { get; set; } = false;
+    public DateTime? ActivatedAt { get; set; }
+    public List<RecipeComponent> RecipeComponents { get; set; } = new();
+}
+
+public class RecipeComponent : BaseEntity
+{
+    public string JmfVersionId { get; set; } = string.Empty;
+    public JmfVersion? JmfVersion { get; set; }
+    public string MaterialId { get; set; } = string.Empty;
+    public Material? Material { get; set; }
+    public decimal TargetQuantity { get; set; }
+    public string Unit { get; set; } = "kg";
+    public int SequenceOrder { get; set; } = 1;
+    public double TolerancePercentage { get; set; } = 2.0;
+}
+
+public class BatchJmfSnapshot : BaseEntity
+{
+    public string BatchLogId { get; set; } = string.Empty;
+    public string JmfId { get; set; } = string.Empty;
+    public string JmfCode { get; set; } = string.Empty;
+    public string JmfName { get; set; } = string.Empty;
+    public string JmfVersionId { get; set; } = string.Empty;
+    public int VersionNumber { get; set; }
+    public double TargetVolumeM3 { get; set; } = 1.0;
+    public string ComponentsJson { get; set; } = "[]";
+}
+
+public record RecipeComponentSnapshotItem(
+    string MaterialId,
+    string MaterialCode,
+    string MaterialName,
+    MaterialType MaterialType,
+    decimal TargetQuantity,
+    string Unit,
+    int SequenceOrder,
+    double TolerancePercentage
+);
 
 public class UserAccount : BaseEntity
 {

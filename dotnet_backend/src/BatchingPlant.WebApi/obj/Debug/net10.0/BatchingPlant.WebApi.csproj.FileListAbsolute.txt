@@ -6,3 +6,6 @@
 /app/applet/dotnet_backend/src/BatchingPlant.WebApi/obj/Debug/net10.0/BatchingPlant.WebApi.csproj.CoreCompileInputs.cache
 /app/applet/dotnet_backend/src/BatchingPlant.WebApi/obj/Debug/net10.0/BatchingPlant.WebApi.MvcApplicationPartsAssemblyInfo.cs
 /app/applet/dotnet_backend/src/BatchingPlant.WebApi/obj/Debug/net10.0/BatchingPlant.WebApi.MvcApplicationPartsAssemblyInfo.cache
+/app/applet/dotnet_backend/src/BatchingPlant.WebApi/obj/Debug/net10.0/BatchingPlant.WebApi.dll
+/app/applet/dotnet_backend/src/BatchingPlant.WebApi/obj/Debug/net10.0/refint/BatchingPlant.WebApi.dll
+/app/applet/dotnet_backend/src/BatchingPlant.WebApi/obj/Debug/net10.0/BatchingPlant.WebApi.pdb

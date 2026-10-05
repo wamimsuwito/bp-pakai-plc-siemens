@@ -22,6 +22,7 @@ public class BatchExecutionService : IBatchExecutionService
     private readonly ISiemensS7Service _plcService;
     private readonly IBatchRepository _batchRepository;
     private readonly ISyncEngine _syncEngine;
+    private readonly IJmfService? _jmfService;
 
     private BatchLog? _currentBatch;
     private BatchStatus _status = BatchStatus.IDLE;
@@ -35,11 +36,13 @@ public class BatchExecutionService : IBatchExecutionService
     public BatchExecutionService(
         ISiemensS7Service plcService,
         IBatchRepository batchRepository,
-        ISyncEngine syncEngine)
+        ISyncEngine syncEngine,
+        IJmfService? jmfService = null)
     {
         _plcService = plcService;
         _batchRepository = batchRepository;
         _syncEngine = syncEngine;
+        _jmfService = jmfService;
     }
 
     public async Task<(bool Success, string? ErrorCode, string? Message)> SetOperatingModeAsync(BatchingMode mode, CancellationToken ct = default)
@@ -151,6 +154,20 @@ public class BatchExecutionService : IBatchExecutionService
         };
 
         _status = BatchStatus.WEIGHING;
+
+        if (_jmfService != null)
+        {
+            try
+            {
+                var snapshot = await _jmfService.CreateBatchSnapshotAsync(_currentBatch.Id, request.RecipeId, request.TargetVolumeM3, ct);
+                _currentBatch.JmfSnapshotId = snapshot.Id;
+            }
+            catch (Exception ex)
+            {
+                // JMF snapshot failure should not crash execution but log notice
+                Console.WriteLine($"JMF snapshot notice: {ex.Message}");
+            }
+        }
 
         // Save initial state locally
         await _batchRepository.AddBatchLogAsync(_currentBatch);

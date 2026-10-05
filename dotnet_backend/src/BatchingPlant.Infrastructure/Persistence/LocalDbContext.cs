@@ -7,6 +7,11 @@ namespace BatchingPlant.Infrastructure.Persistence;
 public class LocalDbContext : DbContext
 {
     public DbSet<JobMixFormula> JobMixFormulas => Set<JobMixFormula>();
+    public DbSet<Material> Materials => Set<Material>();
+    public DbSet<Jmf> Jmfs => Set<Jmf>();
+    public DbSet<JmfVersion> JmfVersions => Set<JmfVersion>();
+    public DbSet<RecipeComponent> RecipeComponents => Set<RecipeComponent>();
+    public DbSet<BatchJmfSnapshot> BatchJmfSnapshots => Set<BatchJmfSnapshot>();
     public DbSet<BatchLog> BatchLogs => Set<BatchLog>();
     public DbSet<UserAccount> UserAccounts => Set<UserAccount>();
     public DbSet<SiloInventory> SiloInventories => Set<SiloInventory>();
@@ -30,6 +35,61 @@ public class LocalDbContext : DbContext
             b.HasIndex(x => x.MutuBeton);
         });
 
+        // Material
+        modelBuilder.Entity<Material>(b =>
+        {
+            b.HasKey(x => x.Id);
+            b.HasIndex(x => x.Code).IsUnique();
+            b.HasIndex(x => x.MaterialType);
+            b.HasIndex(x => x.IsActive);
+        });
+
+        // Jmf
+        modelBuilder.Entity<Jmf>(b =>
+        {
+            b.HasKey(x => x.Id);
+            b.HasIndex(x => x.Code).IsUnique();
+            b.HasIndex(x => x.IsActive);
+            b.HasMany(x => x.Versions)
+             .WithOne(v => v.Jmf)
+             .HasForeignKey(v => v.JmfId)
+             .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // JmfVersion
+        modelBuilder.Entity<JmfVersion>(b =>
+        {
+            b.HasKey(x => x.Id);
+            b.HasIndex(x => new { x.JmfId, x.VersionNumber }).IsUnique();
+            b.HasIndex(x => x.Status);
+            b.HasMany(x => x.RecipeComponents)
+             .WithOne(c => c.JmfVersion)
+             .HasForeignKey(c => c.JmfVersionId)
+             .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // RecipeComponent
+        modelBuilder.Entity<RecipeComponent>(b =>
+        {
+            b.HasKey(x => x.Id);
+            b.HasIndex(x => new { x.JmfVersionId, x.MaterialId }).IsUnique();
+            b.Property(x => x.TargetQuantity).HasPrecision(18, 4);
+            b.HasOne(x => x.Material)
+             .WithMany()
+             .HasForeignKey(x => x.MaterialId)
+             .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // BatchJmfSnapshot
+        modelBuilder.Entity<BatchJmfSnapshot>(b =>
+        {
+            b.HasKey(x => x.Id);
+            b.HasIndex(x => x.BatchLogId);
+            b.HasIndex(x => x.JmfId);
+            b.HasIndex(x => x.JmfVersionId);
+            b.Property(x => x.TargetVolumeM3).HasPrecision(18, 4);
+        });
+
         // BatchLog
         modelBuilder.Entity<BatchLog>(b =>
         {
@@ -37,6 +97,10 @@ public class LocalDbContext : DbContext
             b.HasIndex(x => x.BatchNumber).IsUnique();
             b.HasIndex(x => x.StartTime);
             b.HasIndex(x => x.IsSyncedToCentral);
+            b.HasOne(x => x.JmfSnapshot)
+             .WithMany()
+             .HasForeignKey(x => x.JmfSnapshotId)
+             .OnDelete(DeleteBehavior.SetNull);
         });
 
         // UserAccount

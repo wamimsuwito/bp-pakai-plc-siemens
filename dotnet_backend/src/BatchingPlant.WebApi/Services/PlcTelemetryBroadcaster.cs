@@ -41,11 +41,11 @@ public class PlcTelemetryBroadcaster : BackgroundService
                 {
                     weights = new
                     {
-                        aggregate = telemetry.WeightAggregate,
-                        cement = telemetry.WeightCement,
-                        water = telemetry.WeightWater,
-                        additive = telemetry.WeightAdditive,
-                        waitingHopper = telemetry.WeightWaitingHopper
+                        aggregate = telemetry.AggregateWeightKg,
+                        cement = telemetry.CementWeightKg,
+                        water = telemetry.WaterWeightKg,
+                        additive = telemetry.AdditiveWeightKg,
+                        waitingHopper = telemetry.WaitingHopperWeightKg
                     },
                     ampere = telemetry.MixerCurrentAmpere,
                     pressure = telemetry.AirPressureBar,

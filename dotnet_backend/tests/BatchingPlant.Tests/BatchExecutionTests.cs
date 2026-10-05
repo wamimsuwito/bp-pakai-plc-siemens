@@ -22,6 +22,7 @@ public class BatchExecutionTests
         _mockSync = new Mock<ISyncEngine>();
 
         // Default healthy PLC response
+        _mockPlc.Setup(p => p.IsConnected).Returns(true);
         _mockPlc.Setup(p => p.ReadTelemetryAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ScaleTelemetry(0, 0, 0, 0, 0, 6.5, 0, 12.0, false, true, true));
 

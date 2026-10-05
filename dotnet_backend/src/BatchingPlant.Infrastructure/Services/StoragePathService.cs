@@ -27,14 +27,9 @@ public class StoragePathService : IStoragePathService
         {
             RootPath = configuredRoot;
         }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            RootPath = @"D:\BatchingPlant";
-        }
         else
         {
-            // Cross-platform non-Windows fallback for test/dev environments without drive D:
-            RootPath = Path.Combine(AppContext.BaseDirectory, "BatchingPlant_Data");
+            RootPath = @"D:\BatchingPlant";
         }
 
         EnsureDirectoriesCreated();

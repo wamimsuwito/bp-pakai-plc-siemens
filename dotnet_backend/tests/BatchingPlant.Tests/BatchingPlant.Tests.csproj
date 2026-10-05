@@ -12,6 +12,11 @@
     <ProjectReference Include="..\..\src\BatchingPlant.Domain\BatchingPlant.Domain.csproj" />
     <ProjectReference Include="..\..\src\BatchingPlant.Application\BatchingPlant.Application.csproj" />
     <ProjectReference Include="..\..\src\BatchingPlant.Infrastructure\BatchingPlant.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\BatchingPlant.WebApi\BatchingPlant.WebApi.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <ItemGroup>
